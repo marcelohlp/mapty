@@ -1,3 +1,5 @@
+"use strict";
+
 export default class App {
     #map;
     #mapEvent;
@@ -8,7 +10,7 @@ export default class App {
     #inputCadence;
     #inputElevation;
 
-    constructor(form, inputType, inputDistance, inputDuration, inputCadence, inputElevation) {
+    constructor({ form, inputType, inputDistance, inputDuration, inputCadence, inputElevation }) {
         this.#form = form;
         this.#inputType = inputType;
         this.#inputDistance = inputDistance;

@@ -29,4 +29,14 @@ export default class Cycling extends Workout {
     getType() {
         return this.#type;
     }
+
+    toJSON() {
+        return {
+            type: this.#type,
+            coords: this.getCoords(),
+            distance: this.getDistance(),
+            duration: this.getDuration(),
+            elevationGain: this.#elevationGain,
+        };
+    }
 }

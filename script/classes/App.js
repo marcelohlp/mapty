@@ -17,6 +17,7 @@ export default class App {
     constructor(dom) {
         this.#dom = dom;
         this.#getPosition();
+        this.#getLocalStorage();
         this.#dom.getForm().addEventListener("submit", this.#newWorkout.bind(this));
         this.#dom.getInputType().addEventListener("change", this.#toggleElevationField.bind(this));
         this.#dom.getContainerWorkouts().addEventListener("click", this.#moveToPopup.bind(this));
@@ -34,12 +35,41 @@ export default class App {
         LeafletMap.createTileLayer(this.#map);
 
         this.#map.on("click", this.#showForm.bind(this));
+
+        this.#workouts.forEach((workout) => {
+            LeafletMap.renderMarker({
+                latitude: workout.getCoords().at(0),
+                longitude: workout.getCoords().at(1),
+                map: this.#map,
+                className: `${workout.getType()}-popup`,
+                content: String(workout.getDescription()),
+            });
+        });
     }
 
     #showForm(event) {
         this.#mapEvent = event;
         this.#dom.getForm().classList.remove("hidden");
         this.#dom.getInputDistance().focus();
+    }
+
+    #getLocalStorage() {
+        const data = JSON.parse(localStorage.getItem("workouts"));
+
+        if (!data) return;
+
+        this.#workouts = data.map((workout) => {
+            if (workout.type === "running") {
+                return new Running(workout.coords, workout.distance, workout.duration, workout.cadence);
+            }
+            if (workout.type === "cycling") {
+                return new Cycling(workout.coords, workout.distance, workout.duration, workout.elevationGain);
+            }
+        });
+
+        this.#workouts.forEach((workout) => {
+            this.#renderWorkout(workout);
+        });
     }
 
     #hiddeForm() {
@@ -96,6 +126,8 @@ export default class App {
         this.#setInputsValues("");
 
         this.#hiddeForm();
+
+        this.#setLocalStorage();
     }
 
     #setInputsValues(value) {
@@ -160,6 +192,10 @@ export default class App {
         }
 
         this.#dom.getForm().insertAdjacentHTML("afterend", html);
+    }
+
+    #setLocalStorage() {
+        localStorage.setItem("workouts", JSON.stringify(this.#workouts));
     }
 
     #moveToPopup(event) {

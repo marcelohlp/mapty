@@ -1,6 +1,6 @@
 "use strict";
 
-import App from "./App.js";
+import App from "./classes/App.js";
 import DOM from "./classes/DOM.js";
 
-const app = new App(DOM.create());
+new App(DOM.create());

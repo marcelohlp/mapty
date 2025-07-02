@@ -1,14 +1,18 @@
 "use strict";
 
+import LeafletMap from "./LeafletMap.js";
 import Cycling from "./Cycling.js";
 import Running from "./Running.js";
 
 export default class App {
+    #dom;
     #map;
+
     #mapEvent;
     #workouts = [];
 
-    #dom;
+    #mapId = "map";
+    #defaultZoom = 13;
 
     constructor(dom) {
         this.#dom = dom;
@@ -24,14 +28,10 @@ export default class App {
 
     #loadMap(positon) {
         const { latitude, longitude } = positon.coords;
-        const coords = [latitude, longitude];
-        const zoom = 13;
 
-        this.#map = L.map("map").setView(coords, zoom);
+        this.#map = LeafletMap.setInitialMap(this.#mapId, latitude, longitude, this.#defaultZoom);
 
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(this.#map);
+        LeafletMap.createTileLayer(this.#map);
 
         this.#map.on("click", this.#showForm.bind(this));
     }
@@ -83,7 +83,13 @@ export default class App {
 
         this.#workouts.push(workout);
 
-        this.#renderWorkoutMarker(workout);
+        LeafletMap.renderMarker({
+            latitude: workout.getCoords().at(0),
+            longitude: workout.getCoords().at(1),
+            map: this.#map,
+            className: `${workout.getType()}-popup`,
+            content: String(workout.getDescription()),
+        });
 
         this.#renderWorkout(workout);
 
@@ -103,22 +109,6 @@ export default class App {
     #getMapEventCoords(mapEvent) {
         const { lat: latitude, lng: longitude } = mapEvent.latlng;
         return [latitude, longitude];
-    }
-
-    #renderWorkoutMarker(workout) {
-        L.marker(workout.getCoords())
-            .addTo(this.#map)
-            .bindPopup(
-                L.popup({
-                    maxWidth: 250,
-                    minWidth: 100,
-                    autoClose: false,
-                    closeOnClick: false,
-                    className: `${workout.getType()}-popup`,
-                })
-            )
-            .setPopupContent(String(workout.getDescription()))
-            .openPopup();
     }
 
     #renderWorkout(workout) {
@@ -176,11 +166,20 @@ export default class App {
         const element = event.target.closest(".workout");
         if (!element) return;
         const workout = this.#workouts.find((workout) => workout.getId() === element.dataset.id);
-        this.#map.setView(workout.getCoords(), 13, {
+
+        const setViewToMarkerOptions = {
             animate: true,
             pan: {
                 duration: 1,
             },
+        };
+
+        LeafletMap.setViewToMarker({
+            map: this.#map,
+            latitude: workout.getCoords().at(0),
+            longitude: workout.getCoords().at(1),
+            zoom: this.#defaultZoom,
+            options: setViewToMarkerOptions,
         });
     }
 }

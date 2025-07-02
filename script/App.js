@@ -7,26 +7,15 @@ export default class App {
     #map;
     #mapEvent;
     #workouts = [];
-    #form;
-    #inputType;
-    #inputDistance;
-    #inputDuration;
-    #inputCadence;
-    #inputElevation;
-    #containerWorkouts;
 
-    constructor({ form, inputType, inputDistance, inputDuration, inputCadence, inputElevation, containerWorkouts }) {
-        this.#form = form;
-        this.#inputType = inputType;
-        this.#inputDistance = inputDistance;
-        this.#inputDuration = inputDuration;
-        this.#inputCadence = inputCadence;
-        this.#inputElevation = inputElevation;
-        this.#containerWorkouts = containerWorkouts;
+    #dom;
+
+    constructor(dom) {
+        this.#dom = dom;
         this.#getPosition();
-        this.#form.addEventListener("submit", this.#newWorkout.bind(this));
-        this.#inputType.addEventListener("change", this.#toggleElevationField.bind(this));
-        this.#containerWorkouts.addEventListener("click", this.#moveToPopup.bind(this));
+        this.#dom.getForm().addEventListener("submit", this.#newWorkout.bind(this));
+        this.#dom.getInputType().addEventListener("change", this.#toggleElevationField.bind(this));
+        this.#dom.getContainerWorkouts().addEventListener("click", this.#moveToPopup.bind(this));
     }
 
     #getPosition() {
@@ -49,19 +38,19 @@ export default class App {
 
     #showForm(event) {
         this.#mapEvent = event;
-        this.#form.classList.remove("hidden");
-        this.#inputDistance.focus();
+        this.#dom.getForm().classList.remove("hidden");
+        this.#dom.getInputDistance().focus();
     }
 
     #hiddeForm() {
-        this.#form.style.display = "none";
-        this.#form.classList.add("hidden");
-        setTimeout(() => (this.#form.style.display = "grid"), 1000);
+        this.#dom.getForm().style.display = "none";
+        this.#dom.getForm().classList.add("hidden");
+        setTimeout(() => (this.#dom.getForm().style.display = "grid"), 1000);
     }
 
     #toggleElevationField() {
-        this.#inputElevation.closest(".form__row").classList.toggle("form__row--hidden");
-        this.#inputCadence.closest(".form__row").classList.toggle("form__row--hidden");
+        this.#dom.getInputElevation().closest(".form__row").classList.toggle("form__row--hidden");
+        this.#dom.getInputCadence().closest(".form__row").classList.toggle("form__row--hidden");
     }
 
     #newWorkout(event) {
@@ -74,19 +63,19 @@ export default class App {
 
         const coords = this.#getMapEventCoords(this.#mapEvent);
 
-        const type = this.#inputType.value;
-        const distance = +this.#inputDistance.value;
-        const duration = +this.#inputDuration.value;
+        const type = this.#dom.getInputType().value;
+        const distance = +this.#dom.getInputDistance().value;
+        const duration = +this.#dom.getInputDuration().value;
 
         if (type === "running") {
-            const cadence = +this.#inputCadence.value;
+            const cadence = +this.#dom.getInputCadence().value;
             if (!validInputs(distance, duration, cadence) || !allPositive(distance, duration, cadence))
                 return alert("Inputs have to be positive numbers!");
             workout = new Running(coords, distance, duration, cadence);
         }
 
         if (type === "cycling") {
-            const elevationGain = +this.#inputElevation.value;
+            const elevationGain = +this.#dom.getInputElevation().value;
             if (!validInputs(distance, duration, elevationGain) || !allPositive(distance, duration))
                 return alert("Inputs have to be positive numbers!");
             workout = new Cycling(coords, distance, duration, elevationGain);
@@ -104,7 +93,11 @@ export default class App {
     }
 
     #setInputsValues(value) {
-        this.#inputDistance.value = this.#inputCadence.value = this.#inputDuration.value = this.#inputElevation.value = value;
+        this.#dom.getInputDistance().value =
+            this.#dom.getInputCadence().value =
+            this.#dom.getInputDuration().value =
+            this.#dom.getInputElevation().value =
+                value;
     }
 
     #getMapEventCoords(mapEvent) {
@@ -176,7 +169,7 @@ export default class App {
             `;
         }
 
-        this.#form.insertAdjacentHTML("afterend", html);
+        this.#dom.getForm().insertAdjacentHTML("afterend", html);
     }
 
     #moveToPopup(event) {

@@ -2,9 +2,6 @@
 
 import App from "./App.js";
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 const form = document.querySelector(".form");
 const containerWorkouts = document.querySelector(".workouts");
 const inputType = document.querySelector(".form__input--type");

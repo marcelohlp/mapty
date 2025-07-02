@@ -5,6 +5,7 @@ import Workout from "./Workout.js";
 export default class Cycling extends Workout {
     #elevationGain;
     #speed;
+    #type = "cycling";
 
     constructor(coords, distance, duration, elevationGain) {
         super(coords, distance, duration);
@@ -23,5 +24,9 @@ export default class Cycling extends Workout {
 
     getSpeed() {
         return this.#speed;
+    }
+
+    getType() {
+        return this.#type;
     }
 }

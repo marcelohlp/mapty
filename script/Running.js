@@ -5,6 +5,7 @@ import Workout from "./Workout.js";
 export default class Running extends Workout {
     #cadence;
     #pace;
+    #type = "running";
 
     constructor(coords, distance, duration, cadence) {
         super(coords, distance, duration);
@@ -21,5 +22,11 @@ export default class Running extends Workout {
         return this.#cadence;
     }
 
-    get;
+    getPace() {
+        return this.#pace;
+    }
+
+    getType() {
+        return this.#type;
+    }
 }

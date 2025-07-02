@@ -13,17 +13,20 @@ export default class App {
     #inputDuration;
     #inputCadence;
     #inputElevation;
+    #containerWorkouts;
 
-    constructor({ form, inputType, inputDistance, inputDuration, inputCadence, inputElevation }) {
+    constructor({ form, inputType, inputDistance, inputDuration, inputCadence, inputElevation, containerWorkouts }) {
         this.#form = form;
         this.#inputType = inputType;
         this.#inputDistance = inputDistance;
         this.#inputDuration = inputDuration;
         this.#inputCadence = inputCadence;
         this.#inputElevation = inputElevation;
+        this.#containerWorkouts = containerWorkouts;
         this.#getPosition();
         this.#form.addEventListener("submit", this.#newWorkout.bind(this));
         this.#inputType.addEventListener("change", this.#toggleElevationField.bind(this));
+        this.#containerWorkouts.addEventListener("click", this.#moveToPopup.bind(this));
     }
 
     #getPosition() {
@@ -174,5 +177,17 @@ export default class App {
         }
 
         this.#form.insertAdjacentHTML("afterend", html);
+    }
+
+    #moveToPopup(event) {
+        const element = event.target.closest(".workout");
+        if (!element) return;
+        const workout = this.#workouts.find((workout) => workout.getId() === element.dataset.id);
+        this.#map.setView(workout.getCoords(), 13, {
+            animate: true,
+            pan: {
+                duration: 1,
+            },
+        });
     }
 }

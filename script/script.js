@@ -17,4 +17,5 @@ const app = new App({
     inputDuration,
     inputCadence,
     inputElevation,
+    containerWorkouts,
 });
